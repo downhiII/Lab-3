@@ -1,0 +1,64 @@
+/*
+  This program measures the distance using an ultrasonic sensor and displays the readings on an LCD screen. It also reads the temperature and 
+  humidity from a DHT11 sensor and displays the readings on the same LCD screen.
+  The main theme of this program is to demonstrate how to use an ultrasonic sensor, a DHT11 sensor, and an LCD screen with an Arduino board.
+*/
+
+#include "NewPing.h" // Include the NewPing library for measuring distance using an ultrasonic sensor
+#define TRIGGER_PIN 10 // Define the pin number to which the trigger pin of the ultrasonic sensor is connected
+#define ECHO_PIN 13 // Define the pin number to which the echo pin of the ultrasonic sensor is connected
+#define MAX_DISTANCE 400 // Define the maximum distance that the ultrasonic sensor can measure in centimeters
+
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // Create a NewPing object
+
+#include <LiquidCrystal.h> // Include the LiquidCrystal library for controlling the LCD screen
+
+#include <DHT.h> // Include the DHT library for reading the temperature and humidity from the DHT11 sensor
+#define Type DHT11 // Define the type of DHT sensor being used
+int sensePin = 7; // Define the pin number to which the DHT sensor is connected
+DHT HT(sensePin, Type); // Create a DHT object
+
+float humidity; // Declare a variable to store the humidity reading
+float temp; // Declare a variable to store the temperature reading in Celsius
+float duration, distance; // Declare variables to store the duration and distance readings from the ultrasonic sensor
+float soundsp; // Declare a variable to store the speed of sound
+float soundcm; // Declare a variable to store the speed of sound in centimeters per second
+int iterations = 5; // Define the number of iterations for the ultrasonic sensor
+
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2; // Define the pins to which the LCD screen is connected
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // Create a LiquidCrystal object
+
+void setup() {
+  Serial.begin(9600); // Initialize the serial communication at 9600 bits per second
+  lcd.begin(16, 2); // Set up the LCD's number of columns and rows
+  lcd.print("Distance"); // Print a message to the LCD
+  HT.begin(); // Initialize the DHT sensor
+}
+
+void loop() {
+  lcd.setCursor(0, 1); // Set the cursor to the second row of the LCD screen
+  
+  duration = sonar.ping_median(iterations); // Read the duration of the ultrasonic sensor
+  distance = (duration / 2) * 0.0343; // Calculate the distance from the duration
+  
+  humidity = HT.readHumidity(); // Read the humidity from the DHT sensor
+  temp = HT.readTemperature(); // Read the temperature from the DHT sensor in Celsius
+  soundsp = 331.4 + (0.606 * temp) + (0.0124 * humidity); // Calculate the speed of sound
+  soundcm = soundsp / 10000; // Convert the speed of sound to centimeters per second
+  
+  lcd.print(distance); // Display the distance reading on the LCD screen
+  lcd.print(" cm"); // Print a message to the LCD
+  
+  Serial.print("Distance ="); // Print a message to the serial monitor
+  
+  if (distance >= 400 || distance <= 2) { // Check if the distance is out of range
+    Serial.println("Out of range"); // Print a message to the serial monitor
+  }
+  else {
+    Serial.print(distance); // Print the distance reading to the serial monitor
+    Serial.println("cm"); // Print a message to the serial monitor
+    delay(500); // Wait for 500 milliseconds
+  }
+  
+  delay(500); // Wait for 500 milliseconds
+}
