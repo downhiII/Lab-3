@@ -1,0 +1,46 @@
+/*
+  This program measures the temperature and humidity using a DHT11 sensor and displays the readings on an LCD screen.
+  The main theme of this program is to demonstrate how to use a DHT11 sensor and an LCD screen with an Arduino board.
+*/
+
+#include <LiquidCrystal.h> // Include the LiquidCrystal library for controlling the LCD screen
+#include <DHT.h> // Include the DHT library for reading the temperature and humidity from the DHT11 sensor
+
+#define Type DHT11 // Define the type of DHT sensor being used
+int sensePin = 7; // Define the pin number to which the DHT sensor is connected
+DHT HT(sensePin, Type); // Create a DHT object
+
+float humidity; // Declare a variable to store the humidity reading
+float temp; // Declare a variable to store the temperature reading in Celsius
+
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2; // Define the pins to which the LCD screen is connected
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // Create a LiquidCrystal object
+
+float voltage; // Declare a variable to store the voltage reading
+int sensorValue; // Declare a variable to store the analog reading from the A0 pin
+
+void setup() {
+  Serial.begin(9600); // Initialize the serial communication at 9600 bits per second
+  lcd.begin(16, 2); // Set up the LCD's number of columns and rows
+  lcd.print("Temp = "); // Print a message to the LCD
+  HT.begin(); // Initialize the DHT sensor
+}
+
+void loop() {
+  humidity = HT.readHumidity(); // Read the humidity from the DHT sensor
+  temp = HT.readTemperature(); // Read the temperature from the DHT sensor in Celsius
+  
+  sensorValue = analogRead(A0); // Read the analog value from the A0 pin
+  voltage = sensorValue * (5.0 / 1023.0); // Convert the analog value to voltage
+  
+  Serial.print("temperature   "); // Print a message to the serial monitor
+  Serial.println(temp); // Print the temperature reading to the serial monitor
+  Serial.print("humidity   "); // Print a message to the serial monitor
+  Serial.println(humidity); // Print the humidity reading to the serial monitor
+
+  lcd.print(temp); // Display the temperature reading on the LCD screen
+  lcd.setCursor(0, 1); // Set the cursor to the second row of the LCD screen
+  lcd.print("Humidity = "); // Print a message to the LCD
+  lcd.print(humidity); // Display the humidity reading on the LCD screen
+  delay(150); // Wait for 150 milliseconds
+}
