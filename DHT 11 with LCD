@@ -30,9 +30,6 @@ void loop() {
   humidity = HT.readHumidity(); // Read the humidity from the DHT sensor
   temp = HT.readTemperature(); // Read the temperature from the DHT sensor in Celsius
   
-  sensorValue = analogRead(A0); // Read the analog value from the A0 pin
-  voltage = sensorValue * (5.0 / 1023.0); // Convert the analog value to voltage
-  
   Serial.print("temperature   "); // Print a message to the serial monitor
   Serial.println(temp); // Print the temperature reading to the serial monitor
   Serial.print("humidity   "); // Print a message to the serial monitor
